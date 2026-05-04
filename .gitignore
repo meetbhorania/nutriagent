@@ -1,0 +1,32 @@
+# Virtual environment — never commit this
+venv/
+.venv/
+env/
+
+# Environment variables — never commit your API key
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Database (auto-created at runtime)
+*.db
+
+# Frontend build output
+frontend/dist/
+frontend/node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
