@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import RecipeCard from "./components/RecipeCard";
 import HistoryPanel from "./components/HistoryPanel";
-import AgentLog from "./components/AgentLog";
 import "./App.css";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
@@ -22,14 +21,11 @@ const LOADING_STEPS = [
 
 export default function App() {
   const [food, setFood] = useState("");
-  const [apiKey, setApiKey] = useState(localStorage.getItem("nutriagent_key") || "");
-  const [apiKeyInput, setApiKeyInput] = useState(localStorage.getItem("nutriagent_key") || "");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
   const [tab, setTab] = useState("search");
   const [loadingText, setLoadingText] = useState(LOADING_STEPS[0]);
-  const [showKeyBanner, setShowKeyBanner] = useState(!localStorage.getItem("nutriagent_key"));
 
   useEffect(() => {
     let i = 0, iv;
@@ -42,22 +38,9 @@ export default function App() {
     return () => clearInterval(iv);
   }, [loading]);
 
-  function saveKey() {
-    const k = apiKeyInput.trim();
-    if (!k.startsWith("AIza")) {
-      setError("Key should start with 'AIza'. Get yours at aistudio.google.com/app/apikey");
-      return;
-    }
-    localStorage.setItem("nutriagent_key", k);
-    setApiKey(k);
-    setShowKeyBanner(false);
-    setError("");
-  }
-
   async function analyzeFood(override) {
     const query = (override || food).trim();
     if (!query) return;
-    if (!apiKey) { setError("Save your Gemini API key first."); return; }
 
     setFood(query);
     setLoading(true);
@@ -69,7 +52,7 @@ export default function App() {
       const res = await fetch(`${API_BASE}/api/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ food: query, api_key: apiKey }),
+        body: JSON.stringify({ food: query }),
       });
       if (!res.ok) {
         const err = await res.json();
@@ -89,32 +72,6 @@ export default function App() {
     <div className="app">
       <div className="ambient" />
 
-      {/* API Key Banner */}
-      {showKeyBanner && (
-        <div className="key-banner">
-          <span className="banner-label">⬡ Gemini API Key</span>
-          <input
-            type="password"
-            placeholder="AIzaSy... — get free key at aistudio.google.com/app/apikey"
-            value={apiKeyInput}
-            onChange={e => setApiKeyInput(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && saveKey()}
-          />
-          <button className="btn-gold" onClick={saveKey}>Save</button>
-          <a className="banner-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer">
-            Get free key →
-          </a>
-        </div>
-      )}
-
-      {!showKeyBanner && (
-        <div className="key-set-bar">
-          <span className="status-dot" />
-          <span>API key active</span>
-          <button className="btn-ghost-xs" onClick={() => setShowKeyBanner(true)}>Change</button>
-        </div>
-      )}
-
       <main>
         <header>
           <div className="brand-mark">
@@ -128,12 +85,11 @@ export default function App() {
           </div>
           <h1>Food Intelligence,<br /><em>Beautifully Served</em></h1>
           <p className="header-sub">
-            Powered by <strong>Google ADK</strong> — three specialist agents working in sequence:<br />
+            Three specialist agents working in sequence:<br />
             <span className="pipeline-label">RecipeAgent → StepAgent → CalorieAgent</span>
           </p>
         </header>
 
-        {/* Tabs */}
         <div className="tabs">
           <button className={`tab ${tab === "search" ? "active" : ""}`} onClick={() => setTab("search")}>
             ✦ Analyse Food
@@ -155,7 +111,7 @@ export default function App() {
                     value={food}
                     onChange={e => setFood(e.target.value)}
                     onKeyDown={e => e.key === "Enter" && analyzeFood()}
-                    placeholder="e.g. eggs, salmon, avocado, lentils…"
+                    placeholder="e.g. eggs, butter chicken, avocado…"
                     autoFocus
                   />
                   <button className="btn-gold large" onClick={() => analyzeFood()} disabled={loading}>
@@ -189,7 +145,6 @@ export default function App() {
             {result && !loading && (
               <>
                 <RecipeCard result={result} />
-
                 <button className="btn-ghost" onClick={reset}>← Search another ingredient</button>
               </>
             )}
