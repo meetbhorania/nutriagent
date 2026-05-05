@@ -130,6 +130,14 @@ Open **http://localhost:3000** in your browser.
 > **Note:** Every time you open a new terminal session to work on this project, re-activate the venv first:
 > `source venv/` on Mac/Linux or `venv\Scripts\activate` on Windows.
 
+## Live Demo
+🌐 **[https://nutriagent-p1wrb5fwy-meetbhoranias-projects.vercel.app](https://nutriagent-p1wrb5fwy-meetbhoranias-projects.vercel.app)**
+
+## Deployment
+- **Frontend:** Vercel
+- **Backend:** Render
+- **Database:** SQLite (persistent on Render)
+
 ---
 
 ## Using the ADK Dev UI
